@@ -43,11 +43,10 @@ public class SignUpSignInServer {
                 inO = new ObjectInputStream(clientSc.getInputStream()); //recibir mensaje
                 mes = (Message) inO.readObject();
                 
-                LOG.info(mes.getAccion().toString()+" REQUESTED FOR "+mes.getUser().getLogin());
+                LOG.info(mes.getAccion().toString()+" REQUESTED FOR "+mes.getUser().getLogin());       
             }
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, "An error occurred trying to connect with Client", ex);
         }
-    }
-    
+    }  
 }
