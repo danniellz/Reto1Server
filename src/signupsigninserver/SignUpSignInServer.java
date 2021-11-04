@@ -1,11 +1,14 @@
 package signupsigninserver;
 
+import exceptions.ConnectionException;
 import java.io.IOException;
+import static java.lang.Thread.sleep;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import signupsigninserver.worker.Worker;
 
 /**
  * class responsible for starting the application
@@ -21,24 +24,36 @@ public class SignUpSignInServer {
      * 
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
-        ServerSocket serverSc;
-        final int PORT = Integer.parseInt(ResourceBundle.getBundle("signupsigninserver.dao/config").getString("PORT"));
+    public static void main(String[] args) throws InterruptedException, ConnectionException {
+       ServerSocket serverSc;
+        final int PORT = Integer.parseInt(ResourceBundle.getBundle("signupsigninserver.pool/PoolData").getString("PORT"));
+        final int MAXCON = Integer.parseInt(ResourceBundle.getBundle("signupsigninserver.pool/PoolData").getString("MAXCONNECTIONS"));
+        
 
         try {
             serverSc = new ServerSocket(PORT);
             Socket clienteSc;
+            int con;
             LOG.info("SERVER > Initialized");
 
             while(true){
                 //Waiting for client request
-                clienteSc = serverSc.accept();
-                LOG.info("SERVER > Client Connected!");
+                for (con= 1; con <= MAXCON; con++) {
+                    clienteSc = serverSc.accept();
+                    System.out.println("CLIENT " + con + " CONNECTED!");
 
+                    Worker worker = new Worker(clienteSc);
+                    worker.start();
+                }
+                
+                if(con>MAXCON){
+                    sleep(100);
+                    System.out.println("LIMITE DE CONEXIONES ALCANZADO");
+                    throw new ConnectionException();
+                }
             }
         } catch (IOException ex) {
-            System.out.println("Ha ocurrido un error al conectar con el cliente");
-            Logger.getLogger(SignUpSignInServer.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.info("An error Occurred trying to connect with Client");
         }
     }
     
