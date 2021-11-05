@@ -1,10 +1,10 @@
 package signupsigninserver.dao;
 
 import signable.Signable;
-import signupsigninserver.pool.PoolConnection;
 
 /**
- *
+ * Class that return a new DaoImplement
+ * 
  * @author Daniel Brizuela
  */
 public class DaoFactory {

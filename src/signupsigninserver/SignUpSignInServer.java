@@ -26,8 +26,8 @@ public class SignUpSignInServer {
      */
     public static void main(String[] args) throws InterruptedException, ConnectionException {
        ServerSocket serverSc;
-        final int PORT = Integer.parseInt(ResourceBundle.getBundle("signupsigninserver.pool/PoolData").getString("PORT"));
-        final int MAXCON = Integer.parseInt(ResourceBundle.getBundle("signupsigninserver.pool/PoolData").getString("MAXCONNECTIONS"));
+        final int PORT = Integer.parseInt(ResourceBundle.getBundle("signupsigninserver.pool/poolData").getString("PORT"));
+        final int MAXCON = Integer.parseInt(ResourceBundle.getBundle("signupsigninserver.pool/poolData").getString("MAXCONNECTIONS"));
         
 
         try {
@@ -46,11 +46,11 @@ public class SignUpSignInServer {
                     worker.start();
                 }
                 
-                if(con>MAXCON){
+                /*if(con>MAXCON){
                     sleep(100);
                     System.out.println("LIMITE DE CONEXIONES ALCANZADO");
                     throw new ConnectionException();
-                }
+                }*/
             }
         } catch (IOException ex) {
             LOG.info("An error Occurred trying to connect with Client");

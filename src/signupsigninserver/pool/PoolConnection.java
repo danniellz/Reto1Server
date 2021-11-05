@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package signupsigninserver.pool;
 
 import java.sql.Connection;
@@ -12,14 +7,15 @@ import java.util.logging.Logger;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 /**
- *
+ * Class that manage connections
+ * 
  * @author Jonathan Viñan, Daniel Brizuela, Aritz Arrieta
  */
 public class PoolConnection {
     //LOGGER
     private static final Logger LOG = Logger.getLogger(PoolConnection.class.getName());
 
-    private ResourceBundle resourceBundle = ResourceBundle.getBundle("signupsigninserver.pool/PoolData");
+    private ResourceBundle poolData = ResourceBundle.getBundle("signupsigninserver.pool/poolData");
     private static PoolConnection dataSource;
     private static Stack<Connection> poolStack = new Stack<>();
     private Connection con;
@@ -28,10 +24,11 @@ public class PoolConnection {
     //Pool
     private PoolConnection() {
         basicDataSource = new BasicDataSource();
-        basicDataSource.setDriverClassName(resourceBundle.getString("DRIVER"));
-        basicDataSource.setUsername(resourceBundle.getString("USER"));
-        basicDataSource.setPassword(resourceBundle.getString("PASS"));
-        basicDataSource.setUrl(resourceBundle.getString("URL"));
+        basicDataSource.setDriverClassName(poolData.getString("DRIVER"));
+        basicDataSource.setUsername(poolData.getString("USER"));
+        basicDataSource.setPassword(poolData.getString("PASS"));
+        basicDataSource.setUrl(poolData.getString("URL"));
+        basicDataSource.setMaxTotal(Integer.parseInt(poolData.getString("MAXCONNECTIONS")));
     }
 
     /**
@@ -48,7 +45,7 @@ public class PoolConnection {
 
     /**
      * 
-     * @return
+     * @return a connection from the stack
      * @throws Exception 
      */
     public synchronized Connection getConnection() throws Exception {
@@ -68,7 +65,7 @@ public class PoolConnection {
      */
     public synchronized void closeConnection(Connection connection) throws Exception {
         LOG.info("CLOSING AND SAVING CONNECTION");
-        con.close();
-        poolStack.push(con);
+        connection.close();
+        poolStack.push(connection);
     }
 }

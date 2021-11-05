@@ -33,13 +33,14 @@ public class Worker extends Thread {
 
     }
 
+    @Override
     public void run() {
         try {
             LOG.info("Sending info to DaoImplement");
             ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
             ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
             message = (Message) ois.readObject();
-            LOG.info(message.getUser().getLogin());
+            
             Signable sign = new DaoFactory().getDao();
             switch (message.getAccion()) {
                 case SIGNUP:
