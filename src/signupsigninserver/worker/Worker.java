@@ -5,6 +5,12 @@
  */
 package signupsigninserver.worker;
 
+import exceptions.ConnectionException;
+import exceptions.DatabaseNotFoundException;
+import exceptions.IncorrectPasswordException;
+import exceptions.InvalidEmailFormatException;
+import exceptions.UserAlreadyExistException;
+import exceptions.UserNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -44,18 +50,20 @@ public class Worker extends Thread {
             Signable sign = new DaoFactory().getDao();
             switch (message.getAccion()) {
                 case SIGNUP:
-                    sign.signUp(message.getUser());
+                    user = sign.signUp(message.getUser());
                     LOG.info("SignUp");
+                     LOG.info(user.getFullName());
                     break;
                 case SIGNIN:
                     user = sign.signIn(message.getUser());
                     LOG.info("SignIn");
+                    
                     break;
                 default:
                     LOG.severe("Unknown error");
                     break;
             }
-            LOG.info("SENDIND MESSAGE FOR " + user.getFullName());
+             LOG.info("SENDIND MESSAGE FOR " + user.getFullName());
             message.setAccion(Accion.OK);
             message.setUser(user);
             oos.writeObject(message);
@@ -66,6 +74,18 @@ public class Worker extends Thread {
             LOG.info("RUN FAIL");
         } catch (ClassNotFoundException ex) {
             LOG.info("CLASS NOT FOUND");
+        } catch (UserAlreadyExistException ex) {
+            Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UserNotFoundException ex) {
+            Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (DatabaseNotFoundException ex) {
+            Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ConnectionException ex) {
+            Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IncorrectPasswordException ex) {
+            Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidEmailFormatException ex) {
+            Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

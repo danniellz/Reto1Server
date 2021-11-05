@@ -33,7 +33,7 @@ public class DaoImplement implements Signable {
     private PoolConnection pool = PoolConnection.getInstace();
 
     private final String SignIn = "{CALL Login(?, ?)}";
-    private final String SignUp = "INSERT INTO user (login, email, fullName, user.User_Status, user.User_Privilege, user.PASSWORD) VALUES (?,?,?,'enabled','user',?);";
+    private final String SignUp = "INSERT INTO user (login, email, fullName, user.User_Status, user.User_Privilege, user.passw,user.lastPasswordChange) VALUES (?,?,?,'enabled','user',?, NOW());";
 
     /**
      * Method for the SignIn process
@@ -95,9 +95,10 @@ public class DaoImplement implements Signable {
      * Method for the SignUp process
      * 
      * @param user contains the register data
+     * @return 
      */
     @Override
-    public void signUp(User user) {
+    public User signUp(User user) {
         try {
             con = pool.getConnection();
         } catch (Exception ex) {
@@ -105,11 +106,12 @@ public class DaoImplement implements Signable {
         }
         try {
             stmt = con.prepareStatement(SignUp);
-            stmt.setString(0, user.getLogin());
-            stmt.setString(1, user.getEmail());
-            stmt.setString(2, user.getFullName());
-            stmt.setString(5, user.getPassword());
+            stmt.setString(1, user.getLogin());
+            stmt.setString(2, user.getEmail());
+            stmt.setString(3, user.getFullName());
+            stmt.setString(4, user.getPassword());
             
+            stmt.executeUpdate();
         } catch (SQLException ex) {
             LOG.log(Level.SEVERE, "SQL Error SingUp", ex);
         }
@@ -120,6 +122,7 @@ public class DaoImplement implements Signable {
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error Closing Connection in SignUp Process", ex);
         }
+        return user;
 
     }
 

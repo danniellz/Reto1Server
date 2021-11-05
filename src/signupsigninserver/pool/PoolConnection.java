@@ -52,10 +52,11 @@ public class PoolConnection {
         LOG.info("GETTING CONNECTION");
         if (poolStack.isEmpty()) {
             LOG.info("Pool empty, Getting new Connection");
-            con = basicDataSource.getConnection();
-            poolStack.push(con);
+            con = basicDataSource.getConnection();         
+        }else{
+        con = poolStack.pop();
         }
-        return poolStack.pop();
+        return con;
     }
 
     /**
@@ -65,7 +66,6 @@ public class PoolConnection {
      */
     public synchronized void closeConnection(Connection connection) throws Exception {
         LOG.info("CLOSING AND SAVING CONNECTION");
-        connection.close();
         poolStack.push(connection);
     }
 }
