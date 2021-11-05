@@ -8,10 +8,11 @@ import org.apache.commons.dbcp2.BasicDataSource;
 
 /**
  * Class that manage connections
- * 
+ *
  * @author Jonathan Viñan, Daniel Brizuela, Aritz Arrieta
  */
 public class PoolConnection {
+
     //LOGGER
     private static final Logger LOG = Logger.getLogger(PoolConnection.class.getName());
 
@@ -32,8 +33,8 @@ public class PoolConnection {
     }
 
     /**
-     * Pool Singleton 
-     * 
+     * Pool Singleton
+     *
      * @return a new PoolConnection
      */
     public static PoolConnection getInstace() {
@@ -44,28 +45,28 @@ public class PoolConnection {
     }
 
     /**
-     * 
+     *
      * @return a connection from the stack
-     * @throws Exception 
+     * @throws Exception
      */
     public synchronized Connection getConnection() throws Exception {
         LOG.info("GETTING CONNECTION");
         if (poolStack.isEmpty()) {
-            LOG.info("Pool empty, Getting new Connection");
+            LOG.info("Pool Empty, Getting New Connection");
             con = basicDataSource.getConnection();
-            poolStack.push(con);
+        } else {
+            con = poolStack.pop();
         }
-        return poolStack.pop();
+        return con;
     }
 
     /**
-     * 
+     *
      * @param connection
-     * @throws Exception 
+     * @throws Exception
      */
     public synchronized void closeConnection(Connection connection) throws Exception {
-        LOG.info("CLOSING AND SAVING CONNECTION");
-        connection.close();
+        LOG.info("SAVING CONNECTION");
         poolStack.push(connection);
     }
 }
