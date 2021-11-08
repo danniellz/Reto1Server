@@ -1,8 +1,7 @@
 package signupsigninserver.dao;
 
 import exceptions.DatabaseNotFoundException;
-import exceptions.IncorrectPasswordException;
-import exceptions.UserNotFoundException;
+import exceptions.UserPasswordException;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,6 +20,7 @@ import user.UserStatus;
  * Class that Connect with the DB to make the SignIn or SignUp
  *
  * @author Aritz Arrieta, Daniel Brizuela
+ * @version 1.0
  */
 public class DaoImplement implements Signable {
 
@@ -30,7 +30,7 @@ public class DaoImplement implements Signable {
     private Connection con;
     private PreparedStatement stmt;
     private CallableStatement cstmt;
-    private PoolConnection pool = PoolConnection.getInstace();
+    private final PoolConnection pool = PoolConnection.getInstace();
 
     private final String SignIn = "{CALL Login(?, ?)}";
     private final String SignUp = "INSERT INTO user (login, email, fullName, user.User_Status, user.User_Privilege, user.PASSWORD) VALUES (?,?,?,'enabled','user',?);";
@@ -39,12 +39,15 @@ public class DaoImplement implements Signable {
      * Method for the SignIn process
      *
      * @param user contains the login info
+     * @throws exceptions.DatabaseNotFoundException
+     * @throws exceptions.UserPasswordException
      * @return the user object containing the data
      */
     @Override
-    public User signIn(User user) throws DatabaseNotFoundException, UserNotFoundException, IncorrectPasswordException {
+    public User signIn(User user) throws DatabaseNotFoundException, UserPasswordException {
         ResultSet rs = null;
 
+        //Get a connection from the pool
         try {
             con = pool.getConnection();
         } catch (Exception ex) {
@@ -53,6 +56,7 @@ public class DaoImplement implements Signable {
         }
 
         try {
+            //SQL procedure
             LOG.info("Doing SQL FOR " + user.getLogin());
             cstmt = con.prepareCall(SignIn);
             cstmt.setString(1, user.getLogin());
@@ -60,6 +64,7 @@ public class DaoImplement implements Signable {
             cstmt.execute();
             rs = cstmt.getResultSet();
 
+            //if rs is null throw a exception
             if (rs.next()) {
                 LOG.info("Saving User data...");
                 user.setId(rs.getInt(1));
@@ -69,7 +74,9 @@ public class DaoImplement implements Signable {
                 user.setStatus(UserStatus.ENABLED);
                 user.setPrivilege(UserPrivilege.USER);
                 user.setPassword(rs.getString(7));
-                user.setLastPasswordChange(rs.getTimestamp(8));
+
+            } else {
+                throw new UserPasswordException();
             }
 
         } catch (SQLException ex) {

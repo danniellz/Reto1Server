@@ -1,16 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package signupsigninserver.worker;
 
 import exceptions.ConnectionException;
 import exceptions.DatabaseNotFoundException;
-import exceptions.IncorrectPasswordException;
-import exceptions.InvalidEmailFormatException;
+import exceptions.MaxConnectionException;
 import exceptions.UserAlreadyExistException;
-import exceptions.UserNotFoundException;
+import exceptions.UserPasswordException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -25,7 +19,10 @@ import signupsigninserver.dao.DaoFactory;
 import user.User;
 
 /**
- * @author Mikel Matilla
+ * Class that control the simultaneus connection with Threads
+ *
+ * @author Mikel Matilla, Daniel Brizuela
+ * @version 1.0
  */
 public class Worker extends Thread {
 
@@ -37,6 +34,11 @@ public class Worker extends Thread {
     private ObjectInputStream inO = null;
     private ObjectOutputStream outO = null;
 
+    /**
+     * Worker constructor
+     *
+     * @param socket
+     */
     public Worker(Socket socket) {
         this.socket = socket;
 
@@ -45,21 +47,22 @@ public class Worker extends Thread {
     @Override
     public void run() {
         try {
-            sleep(10000);
+            //sleep(10000);
             LOG.info("Sending info to DaoImplement");
             inO = new ObjectInputStream(socket.getInputStream());
             outO = new ObjectOutputStream(socket.getOutputStream());
             message = (Message) inO.readObject();
 
             Signable sign = new DaoFactory().getDao();
+
             switch (message.getAccion()) {
                 case SIGNUP:
                     sign.signUp(message.getUser());
-                    LOG.info("SignUp");
+                    LOG.info("SignUp Process Done");
                     break;
                 case SIGNIN:
                     user = sign.signIn(message.getUser());
-                    LOG.info("SignIn");
+                    LOG.info("SignIn Process Done!");
                     break;
                 default:
                     LOG.severe("Unknown error");
@@ -68,48 +71,42 @@ public class Worker extends Thread {
             LOG.info("SENDIND MESSAGE FOR " + user.getFullName());
             message.setAccion(Accion.OK);
             message.setUser(user);
-            outO.writeObject(message);
 
         } catch (IOException ex) {
             LOG.info("RUN FAIL");
         } catch (ClassNotFoundException ex) {
             LOG.info("CLASS NOT FOUND");
         } catch (UserAlreadyExistException ex) {
-            Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.info("Sending Message for 'User Already Exist' in DB");
             message.setAccion(Accion.USERALREADYEXIST);
             message.setUser(null);
-        } catch (UserNotFoundException ex) {
-            Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
-            message.setAccion(Accion.USERNOTFOUND);
+        } catch (UserPasswordException ex) {
+            LOG.info("Sending Message for 'Incorrect User or Password'");
+            message.setAccion(Accion.INVALIDUSERORPASSWORD);
             message.setUser(null);
         } catch (DatabaseNotFoundException ex) {
-            Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.info("Sending Message for 'Database Error'");
             message.setAccion(Accion.DATABASENOTFOUND);
             message.setUser(null);
-        } catch (ConnectionException ex) {
-            Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ConnectionException | MaxConnectionException ex) {
+            LOG.info("Sending Message for 'Connection Error'");
             message.setAccion(Accion.CONNECTIONNOTFOUND);
             message.setUser(null);
-        } catch (IncorrectPasswordException ex) {
-            Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
-            message.setAccion(Accion.INCORRECTPASSWORD);
-            message.setUser(null);
-        } catch (InvalidEmailFormatException ex) {
-            Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
-            message.setAccion(Accion.EMAILNOTVALID);
-            message.setUser(null);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
+        //} catch (InterruptedException ex) {
+        //    Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
+            //remove a connection when done
+            LOG.info("Releasing Connection...");
             int disconnect = 1;
             SignUpSignInServer freeConnection = new SignUpSignInServer(disconnect);
             try {
                 outO.writeObject(message);
 
+                //Close channels
                 outO.close();
                 inO.close();
             } catch (IOException ex) {
-                Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, "Error en WriteObjet Worker", ex);
+                Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, "Error in Worker, try-catch in finally", ex);
             }
         }
     }

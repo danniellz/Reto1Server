@@ -10,6 +10,7 @@ import org.apache.commons.dbcp2.BasicDataSource;
  * Class that manage connections
  *
  * @author Jonathan Viñan, Daniel Brizuela, Aritz Arrieta
+ * @version 1.0
  */
 public class PoolConnection {
 
@@ -29,7 +30,6 @@ public class PoolConnection {
         basicDataSource.setUsername(poolData.getString("USER"));
         basicDataSource.setPassword(poolData.getString("PASS"));
         basicDataSource.setUrl(poolData.getString("URL"));
-        basicDataSource.setMaxTotal(Integer.parseInt(poolData.getString("MAXCONNECTIONS")));
     }
 
     /**
@@ -61,6 +61,7 @@ public class PoolConnection {
     }
 
     /**
+     * Method that save the connection in a Stack when a client is done using it
      *
      * @param connection
      * @throws Exception
