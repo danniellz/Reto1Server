@@ -8,10 +8,12 @@ import org.apache.commons.dbcp2.BasicDataSource;
 
 /**
  * Class that manage connections
- * 
+ *
  * @author Jonathan Viñan, Daniel Brizuela, Aritz Arrieta
+ * @version 1.0
  */
 public class PoolConnection {
+
     //LOGGER
     private static final Logger LOG = Logger.getLogger(PoolConnection.class.getName());
 
@@ -28,12 +30,11 @@ public class PoolConnection {
         basicDataSource.setUsername(poolData.getString("USER"));
         basicDataSource.setPassword(poolData.getString("PASS"));
         basicDataSource.setUrl(poolData.getString("URL"));
-        basicDataSource.setMaxTotal(Integer.parseInt(poolData.getString("MAXCONNECTIONS")));
     }
 
     /**
-     * Pool Singleton 
-     * 
+     * Pool Singleton
+     *
      * @return a new PoolConnection
      */
     public static PoolConnection getInstace() {
@@ -44,28 +45,29 @@ public class PoolConnection {
     }
 
     /**
-     * 
+     *
      * @return a connection from the stack
-     * @throws Exception 
+     * @throws Exception
      */
     public synchronized Connection getConnection() throws Exception {
         LOG.info("GETTING CONNECTION");
         if (poolStack.isEmpty()) {
-            LOG.info("Pool empty, Getting new Connection");
+            LOG.info("Pool Empty, Getting New Connection");
             con = basicDataSource.getConnection();
-            poolStack.push(con);
+        } else {
+            con = poolStack.pop();
         }
-        return poolStack.pop();
+        return con;
     }
 
     /**
-     * 
+     * Method that save the connection in a Stack when a client is done using it
+     *
      * @param connection
-     * @throws Exception 
+     * @throws Exception
      */
     public synchronized void closeConnection(Connection connection) throws Exception {
-        LOG.info("CLOSING AND SAVING CONNECTION");
-        connection.close();
+        LOG.info("SAVING CONNECTION");
         poolStack.push(connection);
     }
 }
