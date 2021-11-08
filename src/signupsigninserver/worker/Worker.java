@@ -75,6 +75,7 @@ public class Worker extends Thread {
         } catch (ClassNotFoundException ex) {
             LOG.info("CLASS NOT FOUND");
         } catch (UserAlreadyExistException ex) {
+             LOG.info("USER ALREADY EXIST ");
             Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
         } catch (UserNotFoundException ex) {
             Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
