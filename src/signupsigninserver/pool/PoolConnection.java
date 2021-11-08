@@ -52,10 +52,12 @@ public class PoolConnection {
     public synchronized Connection getConnection() throws Exception {
         LOG.info("GETTING CONNECTION");
         if (poolStack.isEmpty()) {
+
             LOG.info("Pool Empty, Getting New Connection");
             con = basicDataSource.getConnection();
         } else {
             con = poolStack.pop();
+
         }
         return con;
     }
@@ -67,7 +69,9 @@ public class PoolConnection {
      * @throws Exception
      */
     public synchronized void closeConnection(Connection connection) throws Exception {
+
         LOG.info("SAVING CONNECTION");
+
         poolStack.push(connection);
     }
 }

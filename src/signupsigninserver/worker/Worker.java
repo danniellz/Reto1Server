@@ -2,9 +2,11 @@ package signupsigninserver.worker;
 
 import exceptions.ConnectionException;
 import exceptions.DatabaseNotFoundException;
+
 import exceptions.MaxConnectionException;
 import exceptions.UserAlreadyExistException;
 import exceptions.UserPasswordException;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -57,9 +59,11 @@ public class Worker extends Thread {
 
             switch (message.getAccion()) {
                 case SIGNUP:
-                    sign.signUp(message.getUser());
-                    LOG.info("SignUp Process Done");
+                    user = sign.signUp(message.getUser());
+                    LOG.info("SignUp Process Done!");
+                   
                     break;
+               
                 case SIGNIN:
                     user = sign.signIn(message.getUser());
                     LOG.info("SignIn Process Done!");
@@ -68,7 +72,7 @@ public class Worker extends Thread {
                     LOG.severe("Unknown error");
                     break;
             }
-            LOG.info("SENDIND MESSAGE FOR " + user.getFullName());
+             LOG.info("SENDIND MESSAGE FOR " + user.getFullName());
             message.setAccion(Accion.OK);
             message.setUser(user);
 
@@ -108,6 +112,7 @@ public class Worker extends Thread {
             } catch (IOException ex) {
                 Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, "Error in Worker, try-catch in finally", ex);
             }
+
         }
     }
 

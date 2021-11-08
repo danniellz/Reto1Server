@@ -1,7 +1,11 @@
 package signupsigninserver.dao;
 
+
+import exceptions.UserAlreadyExistException;
+
 import exceptions.DatabaseNotFoundException;
 import exceptions.UserPasswordException;
+
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -33,8 +37,8 @@ public class DaoImplement implements Signable {
     private final PoolConnection pool = PoolConnection.getInstace();
 
     private final String SignIn = "{CALL Login(?, ?)}";
-    private final String SignUp = "INSERT INTO user (login, email, fullName, user.User_Status, user.User_Privilege, user.PASSWORD) VALUES (?,?,?,'enabled','user',?);";
-
+    private final String SignUp = "INSERT INTO user (login, email, fullName, user.User_Status, user.User_Privilege, user.passw,user.lastPasswordChange) VALUES (?,?,?,'enabled','user',?, NOW());";
+    private final String UserExist = "SELECT user.login FROM user WHERE user.login= ?";
     /**
      * Method for the SignIn process
      *
@@ -107,20 +111,32 @@ public class DaoImplement implements Signable {
      * Method for the SignUp process
      *
      * @param user contains the register data
+     * @return 
      */
     @Override
-    public void signUp(User user) {
+    public User signUp(User user) throws UserAlreadyExistException {
+        
+        Boolean exist = userExist(user.getLogin()); 
+        
         try {
             con = pool.getConnection();
         } catch (Exception ex) {
             Logger.getLogger(DaoImplement.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
+           
             stmt = con.prepareStatement(SignUp);
-            stmt.setString(0, user.getLogin());
-            stmt.setString(1, user.getEmail());
-            stmt.setString(2, user.getFullName());
-            stmt.setString(5, user.getPassword());
+
+            stmt.setString(1, user.getLogin());
+            stmt.setString(2, user.getEmail());
+            stmt.setString(3, user.getFullName());
+            stmt.setString(4, user.getPassword());
+            //stmt.executeUpdate();
+            if(!exist){
+                stmt.executeUpdate();
+            }else{
+              throw new UserAlreadyExistException();
+            }
 
         } catch (SQLException ex) {
             LOG.log(Level.SEVERE, "SQL Error SingUp", ex);
@@ -132,7 +148,39 @@ public class DaoImplement implements Signable {
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Error Closing Connection in SignUp Process", ex);
         }
+        return user;
 
     }
+public Boolean userExist(String login){
+    boolean exist = false;
+    ResultSet rs= null;  
+    try {
+            con = pool.getConnection();
+        } catch (Exception ex) {
+            Logger.getLogger(DaoImplement.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+             //*****COMPROBACION DE USER YA EXISTE******  
+              stmt = con.prepareStatement(UserExist);
+              stmt.setString(1, login);
+              rs = stmt.executeQuery();
+                if(rs.next()){
+                   exist= true; 
+                }
+             //***********FINAL DE COMPROBACION***********  
+        } catch (SQLException ex) {
+            Logger.getLogger(DaoImplement.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            pool.closeConnection(con);
+        } catch (SQLException ex) {
+            LOG.log(Level.SEVERE, "SQL Error in SignUp Process", ex);
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Error Closing Connection in SignUp Process", ex);
+        }
+    
+    
+    return exist;
 
+}
 }
