@@ -26,8 +26,10 @@ import user.User;
  */
 public class Worker extends Thread {
 
+    //LOGGER
     private static final Logger LOG = Logger.getLogger(Worker.class.getName());
 
+    //Attributes
     private Socket socket = null;
     private Message message = null;
     private User user = null;
@@ -37,7 +39,7 @@ public class Worker extends Thread {
     /**
      * Worker constructor
      *
-     * @param socket
+     * @param socket the client socket
      */
     public Worker(Socket socket) {
         this.socket = socket;

@@ -6,6 +6,7 @@ import signable.Signable;
  * Class that return a new DaoImplement
  * 
  * @author Daniel Brizuela
+ * @version 1.0
  */
 public class DaoFactory {
 

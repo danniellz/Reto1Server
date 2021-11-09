@@ -20,19 +20,19 @@ import signupsigninserver.worker.Worker;
  * @version 1.0
  */
 public class SignUpSignInServer {
-
     //LOGGER
     private static final Logger LOG = Logger.getLogger(SignUpSignInServer.class.getName());
 
+    //Attributes
     private static int con = 0;
 
     /**
      * Main class, start the application
      *
      * @param args the command line arguments
-     * @throws exceptions.ConnectionException
-     * @throws exceptions.MaxConnectionException
-     * @throws java.io.IOException
+     * @throws exceptions.ConnectionException if the connection with the client fails, error message
+     * @throws exceptions.MaxConnectionException if there is no thread available, error message
+     * @throws java.io.IOException general exception
      */
     public static void main(String[] args) throws ConnectionException, MaxConnectionException, IOException {
         //Attributes
@@ -40,6 +40,7 @@ public class SignUpSignInServer {
         Socket clientSc = null;
         Message mes = new Message();
         ObjectOutputStream outO;
+        //Pool Properties
         final int PORT = Integer.parseInt(ResourceBundle.getBundle("signupsigninserver.pool/poolData").getString("PORT"));
         final int MAXCON = Integer.parseInt(ResourceBundle.getBundle("signupsigninserver.pool/poolData").getString("MAXCONNECTIONS"));
 
@@ -83,7 +84,7 @@ public class SignUpSignInServer {
     /**
      * Method that remove a connection when done to be able of use a socket
      *
-     * @param freeConnection if a connection ends, free it
+     * @param freeConnection a integer with value 1
      */
     public SignUpSignInServer(int freeConnection) {
         con = con - freeConnection;

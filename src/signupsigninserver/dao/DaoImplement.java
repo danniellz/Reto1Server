@@ -28,11 +28,13 @@ public class DaoImplement implements Signable {
     //LOGGER
     private static final Logger LOG = Logger.getLogger(SignUpSignInServer.class.getName());
 
+    //Attributes
     private Connection con;
     private PreparedStatement stmt;
     private CallableStatement cstmt;
     private final PoolConnection pool = PoolConnection.getInstace();
 
+    //SQL sentences
     private final String SignIn = "{CALL Login(?, ?)}";
     private final String SignUp = "INSERT INTO user (login, email, fullName, user.User_Status, user.User_Privilege, user.passw,user.lastPasswordChange) VALUES (?,?,?,'enabled','user',?, NOW());";
     private final String UserExist = "SELECT user.login FROM user WHERE user.login= ?";
@@ -41,14 +43,14 @@ public class DaoImplement implements Signable {
      * Method for the SignIn process
      *
      * @param user contains the login info
-     * @throws exceptions.DatabaseNotFoundException
-     * @throws exceptions.UserPasswordException
+     * @throws exceptions.DatabaseNotFoundException if an error with the DB occurred, error message
+     * @throws exceptions.UserPasswordException if the user or password are wrong, error message
      * @return the user object containing the data
      */
     @Override
     public User signIn(User user) throws DatabaseNotFoundException, UserPasswordException {
         ResultSet rs = null;
-
+        
         //Get a connection from the pool
         try {
             con = pool.getConnection();
@@ -107,8 +109,8 @@ public class DaoImplement implements Signable {
      * Method for the SignUp process
      *
      * @param user contains the register data
-     * @return
-     * @throws exceptions.UserAlreadyExistException
+     * @throws exceptions.UserAlreadyExistException if the user already exist, error message
+     * @return a user object
      */
     @Override
     public User signUp(User user) throws UserAlreadyExistException {
