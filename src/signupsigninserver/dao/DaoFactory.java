@@ -10,8 +10,9 @@ import signable.Signable;
 public class DaoFactory {
 
     /**
-     *
-     * @return
+     * Method that return a new DaoImplement
+     * 
+     * @return a new DaoImplement
      */
     public Signable getDao(){
         return new DaoImplement();
