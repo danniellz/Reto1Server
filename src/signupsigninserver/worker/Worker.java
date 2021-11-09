@@ -94,8 +94,6 @@ public class Worker extends Thread {
             LOG.info("Sending Message for 'Connection Error'");
             message.setAccion(Accion.CONNECTIONNOTFOUND);
             message.setUser(null);
-        //} catch (InterruptedException ex) {
-        //    Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             //remove a connection when done
             LOG.info("Releasing Connection...");
