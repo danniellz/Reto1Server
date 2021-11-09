@@ -1,10 +1,8 @@
 package signupsigninserver.dao;
 
 import exceptions.UserAlreadyExistException;
-
 import exceptions.DatabaseNotFoundException;
 import exceptions.UserPasswordException;
-
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -84,8 +82,15 @@ public class DaoImplement implements Signable {
             }
 
         } catch (SQLException ex) {
-            LOG.log(Level.SEVERE, "SQL Error SingIn", ex);
+            LOG.log(Level.SEVERE, "SQL Error SingIn - DB not found or Incorrect Sintax", ex);
             throw new DatabaseNotFoundException();
+        } finally {
+            LOG.info("Closing SQL");
+            try {
+                pool.closeConnection(con);
+            } catch (Exception ex) {
+                Logger.getLogger(DaoImplement.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
         if (rs != null) {
@@ -94,15 +99,6 @@ public class DaoImplement implements Signable {
             } catch (SQLException ex) {
                 LOG.log(Level.SEVERE, "Error Closing RS in SignIn Process", ex);
             }
-        }
-
-        try {
-            LOG.info("Closing SQL");
-            pool.closeConnection(con);
-        } catch (SQLException ex) {
-            LOG.log(Level.SEVERE, "SQL Error while Closing SignIn Process", ex);
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error Closing Connection in SignIn Process", ex);
         }
         return user;
     }
@@ -116,7 +112,6 @@ public class DaoImplement implements Signable {
      */
     @Override
     public User signUp(User user) throws UserAlreadyExistException {
-
         Boolean exist = userExist(user.getLogin());
 
         try {
@@ -139,18 +134,17 @@ public class DaoImplement implements Signable {
 
         } catch (SQLException ex) {
             LOG.log(Level.SEVERE, "SQL Error SingUp", ex);
-        }
-        try {
-            pool.closeConnection(con);
-        } catch (SQLException ex) {
-            LOG.log(Level.SEVERE, "SQL Error in SignUp Process", ex);
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Error Closing Connection in SignUp Process", ex);
+        } finally {
+            LOG.info("Closing SQL");
+            try {
+                pool.closeConnection(con);
+            } catch (Exception ex) {
+                Logger.getLogger(DaoImplement.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return user;
-
     }
-
+    
     /**
      * Method that return a boolean if the username received exist or not
      *

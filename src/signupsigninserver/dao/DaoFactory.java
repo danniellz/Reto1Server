@@ -8,6 +8,11 @@ import signable.Signable;
  * @author Daniel Brizuela
  */
 public class DaoFactory {
+
+    /**
+     *
+     * @return
+     */
     public Signable getDao(){
         return new DaoImplement();
     } 

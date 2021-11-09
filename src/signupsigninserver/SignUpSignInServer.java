@@ -54,7 +54,7 @@ public class SignUpSignInServer {
                 con++;
                 System.out.println("CLIENT " + con + " CONNECTED!");
 
-                //If a client request a connection while there is none, close the socket
+                //If a client request a Thread while there is none, send message and close the socket
                 if (con > MAXCON) {
                     throw new MaxConnectionException();
                 } else {
