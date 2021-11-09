@@ -2,11 +2,9 @@ package signupsigninserver.worker;
 
 import exceptions.ConnectionException;
 import exceptions.DatabaseNotFoundException;
-
 import exceptions.MaxConnectionException;
 import exceptions.UserAlreadyExistException;
 import exceptions.UserPasswordException;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -28,8 +26,10 @@ import user.User;
  */
 public class Worker extends Thread {
 
+    //LOGGER
     private static final Logger LOG = Logger.getLogger(Worker.class.getName());
 
+    //Attributes
     private Socket socket = null;
     private Message message = null;
     private User user = null;
@@ -39,7 +39,7 @@ public class Worker extends Thread {
     /**
      * Worker constructor
      *
-     * @param socket The client socket
+     * @param socket the client socket
      */
     public Worker(Socket socket) {
         this.socket = socket;
@@ -61,9 +61,7 @@ public class Worker extends Thread {
                 case SIGNUP:
                     user = sign.signUp(message.getUser());
                     LOG.info("SignUp Process Done!");
-                   
                     break;
-               
                 case SIGNIN:
                     user = sign.signIn(message.getUser());
                     LOG.info("SignIn Process Done!");
@@ -72,7 +70,7 @@ public class Worker extends Thread {
                     LOG.severe("Unknown error");
                     break;
             }
-             LOG.info("SENDIND MESSAGE FOR " + user.getFullName());
+            LOG.info("SENDIND MESSAGE FOR " + user.getFullName());
             message.setAccion(Accion.OK);
             message.setUser(user);
 

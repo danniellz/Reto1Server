@@ -16,7 +16,8 @@ public class PoolConnection {
 
     //LOGGER
     private static final Logger LOG = Logger.getLogger(PoolConnection.class.getName());
-
+    
+    //Attibutes
     private ResourceBundle poolData = ResourceBundle.getBundle("signupsigninserver.pool/poolData");
     private static PoolConnection dataSource;
     private static Stack<Connection> poolStack = new Stack<>();
@@ -30,6 +31,7 @@ public class PoolConnection {
         basicDataSource.setUsername(poolData.getString("USER"));
         basicDataSource.setPassword(poolData.getString("PASS"));
         basicDataSource.setUrl(poolData.getString("URL"));
+        basicDataSource.setMaxTotal(Integer.parseInt(poolData.getString("MAXCONNECTIONS")));
     }
 
     /**
@@ -45,19 +47,18 @@ public class PoolConnection {
     }
 
     /**
-     *
+     * Get a Connection from the stack if is not empty or create a new Connection
+     * 
      * @return a connection from the stack
-     * @throws Exception
+     * @throws Exception when failed to get a connection
      */
     public synchronized Connection getConnection() throws Exception {
         LOG.info("GETTING CONNECTION");
         if (poolStack.isEmpty()) {
-
             LOG.info("Pool Empty, Getting New Connection");
             con = basicDataSource.getConnection();
         } else {
             con = poolStack.pop();
-
         }
         return con;
     }
@@ -65,13 +66,11 @@ public class PoolConnection {
     /**
      * Method that save the connection in a Stack when a client is done using it
      *
-     * @param connection
-     * @throws Exception
+     * @param connection contains a connection form DaoImplement
+     * @throws Exception if saving the connection fails
      */
     public synchronized void closeConnection(Connection connection) throws Exception {
-
         LOG.info("SAVING CONNECTION");
-
         poolStack.push(connection);
     }
 }
