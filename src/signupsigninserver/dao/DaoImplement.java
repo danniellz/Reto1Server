@@ -43,14 +43,16 @@ public class DaoImplement implements Signable {
      * Method for the SignIn process
      *
      * @param user contains the login info
-     * @throws exceptions.DatabaseNotFoundException if an error with the DB occurred, error message
-     * @throws exceptions.UserPasswordException if the user or password are wrong, error message
+     * @throws exceptions.DatabaseNotFoundException if an error with the DB
+     * occurred, error message
+     * @throws exceptions.UserPasswordException if the user or password are
+     * wrong, error message
      * @return the user object containing the data
      */
     @Override
     public User signIn(User user) throws DatabaseNotFoundException, UserPasswordException {
         ResultSet rs = null;
-        
+
         //Get a connection from the pool
         try {
             con = pool.getConnection();
@@ -109,7 +111,8 @@ public class DaoImplement implements Signable {
      * Method for the SignUp process
      *
      * @param user contains the register data
-     * @throws exceptions.UserAlreadyExistException if the user already exist, error message
+     * @throws exceptions.UserAlreadyExistException if the user already exist,
+     * error message
      * @return a user object
      */
     @Override
@@ -146,7 +149,7 @@ public class DaoImplement implements Signable {
         }
         return user;
     }
-    
+
     /**
      * Method that return a boolean if the username received exist or not
      *
