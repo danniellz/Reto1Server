@@ -36,7 +36,7 @@ public class DaoImplement implements Signable {
 
     //SQL sentences
     private final String SignIn = "{CALL Login(?, ?)}";
-    private final String SignUp = "INSERT INTO user (login, email, fullName, user.User_Status, user.User_Privilege, user.passw,user.lastPasswordChange) VALUES (?,?,?,'enabled','user',?, NOW());";
+    private final String SignUp = "INSERT INTO user (login, email, fullName, user.User_Status, user.User_Privilege, user.passw,user.lastPasswordChange) VALUES (?,?,?,'enabled','User',?, NOW());";
     private final String UserExist = "SELECT user.login FROM user WHERE user.login= ?";
 
     /**
