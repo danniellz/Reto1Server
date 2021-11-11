@@ -21,7 +21,7 @@ import user.User;
 /**
  * Class that control the simultaneus connection with Threads
  *
- * @author Mikel Matilla, Daniel Brizuela
+ * @author Mikel Matilla
  * @version 1.0
  */
 public class Worker extends Thread {

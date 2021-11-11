@@ -9,7 +9,7 @@ import org.apache.commons.dbcp2.BasicDataSource;
 /**
  * Class that manage connections
  *
- * @author Jonathan Viñan, Daniel Brizuela, Aritz Arrieta
+ * @author Jonathan Viñan, Aritz Arrieta
  * @version 1.0
  */
 public class PoolConnection {
