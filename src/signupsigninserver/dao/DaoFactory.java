@@ -15,7 +15,7 @@ public class DaoFactory {
      *
      * @return a new DaoImplement
      */
-    public Signable getDao() {
+    public static Signable getDao() {
         return new DaoImplement();
     }
 }
