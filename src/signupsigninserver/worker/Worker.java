@@ -50,7 +50,7 @@ public class Worker extends Thread {
     @Override
     public void run() {
         try {
-            sleep(10000);
+            //sleep(10000);
             LOG.info("Sending info to DaoImplement");
             inO = new ObjectInputStream(socket.getInputStream());
             outO = new ObjectOutputStream(socket.getOutputStream());
@@ -106,9 +106,9 @@ public class Worker extends Thread {
             LOG.info("Sending Message for 'Connection Error'");
             message.setAccion(Accion.CONNECTIONNOTFOUND);
             message.setUser(null);
-        } catch (InterruptedException ex) {
+        //} catch (InterruptedException ex) {
             //Interrupted Exception for Sleep
-            Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, "An error occurred with Sleep in Worker", ex);
+        //    Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, "An error occurred with Sleep in Worker", ex);
         } finally {
             //remove a connection when done
             LOG.info("Releasing Connection...");
