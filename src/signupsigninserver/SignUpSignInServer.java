@@ -65,6 +65,7 @@ public class SignUpSignInServer {
             }
 
         } catch (MaxConnectionException ex) {
+            //Sending the message for the Max connection reached opening a writting channel
             LOG.info("Sending message for the 'Max Connection' limit Reached");
             outO = new ObjectOutputStream(clientSc.getOutputStream());
             mes.setAccion(Accion.MAXCONNECTION);
@@ -74,7 +75,7 @@ public class SignUpSignInServer {
 
             //Close socket of extra client
             clientSc.close();
-            LOG.info("Socket close");
+            LOG.info("Client Socket Close");
 
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, "An error Occurred trying to connect with Client", ex);
@@ -82,7 +83,7 @@ public class SignUpSignInServer {
     }
 
     /**
-     * Method that remove a connection when done to be able of use a socket
+     * Method that remove a connection when done to be able to use a socket
      *
      * @param freeConnection a integer with value 1
      */
