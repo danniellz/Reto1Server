@@ -2,9 +2,10 @@ package signupsigninserver.worker;
 
 import exceptions.ConnectionException;
 import exceptions.DatabaseNotFoundException;
+import exceptions.IncorrectPasswordException;
 import exceptions.MaxConnectionException;
 import exceptions.UserAlreadyExistException;
-import exceptions.UserPasswordException;
+import exceptions.UserNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -55,8 +56,10 @@ public class Worker extends Thread {
             outO = new ObjectOutputStream(socket.getOutputStream());
             message = (Message) inO.readObject();
 
-            Signable sign = new DaoFactory().getDao();
+            //Get the DaoImplement from the factory and save it into the Signable interface
+            Signable sign = DaoFactory.getDao();
 
+            //The user requested process to do, SignIn or SignUp
             switch (message.getAccion()) {
                 case SIGNUP:
                     user = sign.signUp(message.getUser());
@@ -75,22 +78,31 @@ public class Worker extends Thread {
             message.setUser(user);
 
         } catch (IOException ex) {
-            LOG.info("RUN FAIL");
+            LOG.severe("RUN FAIL");
         } catch (ClassNotFoundException ex) {
-            LOG.info("CLASS NOT FOUND");
+            LOG.severe("CLASS NOT FOUND");
         } catch (UserAlreadyExistException ex) {
+            //Send the corresponding message if the user already exist
             LOG.info("Sending Message for 'User Already Exist' in DB");
             message.setAccion(Accion.USERALREADYEXIST);
             message.setUser(null);
-        } catch (UserPasswordException ex) {
-            LOG.info("Sending Message for 'Incorrect User or Password'");
-            message.setAccion(Accion.INVALIDUSERORPASSWORD);
+        } catch (UserNotFoundException ex) {
+            //Send the corresponding message if the user doesn't exist
+            LOG.info("Sending Message for 'Incorrect User'");
+            message.setAccion(Accion.USERNOTFOUND);
+            message.setUser(null);
+        } catch (IncorrectPasswordException ex) {
+            //Send the corresponding message if the password is incorrect
+            LOG.info("Sending Message for 'Incorrect Password'");
+            message.setAccion(Accion.INVALIDPASSWORD);
             message.setUser(null);
         } catch (DatabaseNotFoundException ex) {
+            //Send the corresponding message if there is an error with the database
             LOG.info("Sending Message for 'Database Error'");
             message.setAccion(Accion.DATABASENOTFOUND);
             message.setUser(null);
         } catch (ConnectionException | MaxConnectionException ex) {
+            //Send the corresponding message if there is a coneection error
             LOG.info("Sending Message for 'Connection Error'");
             message.setAccion(Accion.CONNECTIONNOTFOUND);
             message.setUser(null);
@@ -100,6 +112,7 @@ public class Worker extends Thread {
             int disconnect = 1;
             SignUpSignInServer freeConnection = new SignUpSignInServer(disconnect);
             try {
+                //Send the message
                 outO.writeObject(message);
 
                 //Close channels
